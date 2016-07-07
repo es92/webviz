@@ -1,0 +1,82 @@
+
+* {
+  -webkit-user-select: none;
+}
+
+.header {
+  padding: .5em;
+  border-bottom: 1px solid #ade;
+}
+
+.mkNewWindow .text {
+  text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2em;
+  font-weight: bold;
+  color: #bbb;
+}
+
+.windows {
+  position: relative;
+}
+
+.window {
+  border-right: 1px solid #ade;
+  border-bottom: 1px solid #ade;
+  position: absolute;
+  background: #fefefe;
+}
+
+.vizWindowHeader {
+  border-top: 1px solid #ade;
+  width: 100%;
+  height: 20px;
+}
+
+.vizWindowDisplay {
+  height: calc(100% - 20px);
+}
+
+.vizWindowToggleSelectPlots {
+  float: left;
+  margin-left: 5px;
+  color: #888;
+}
+
+.vizWindowRemove {
+  float: right;
+  margin-right: 5px;
+  color: #888;
+}
+
+.mkNewWindow:hover .text,
+.vizWindowToggleSelectPlots:hover,
+.vizWindowRemove:hover {
+  color: #444;
+}
+
+.mkNewWindow:active .text,
+.vizWindowRemove:active {
+  margin-left: 1px;
+  margin-top: 1px;
+}
+
+.vizWindowToggleSelectPlots:active {
+  margin-left: 6px;
+  margin-top: 1px;
+}
+
+.vizWindowPlotSelector {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 20px;
+  min-width: 120px;
+  max-width: 10000px;
+  white-space: nowrap;
+  z-index: 1;
+  min-height: 40px;
+  border: 1px solid #ade;
+  background: rgba(255, 255, 255, .75)
+}
