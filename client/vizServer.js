@@ -1,18 +1,15 @@
 
 //=============================================================
 
-function SocketVizServerConfig(){
-  this.port = 10012;
-}
-
-//=============================================================
-
 function SocketVizServer(config){
   makeEventable(this);
   
   this.vizDataInfo = [];
 
-  this.socket = new TestSocket();
+  if (config.socketConfig == null)
+    this.socket = new TestSocket();
+  else
+    this.socket = mkSocket(config.socketConfig);
   this._watchForUpdates();
 
   this.listenersByName = {}
@@ -67,18 +64,13 @@ SocketVizServer.prototype._watchForUpdates = function(){
     if (vizDataDelta.deltaType == VizDataDeltaTypes._Override){
       this.vizDataByName[vizDataDelta.name] = vizDataDelta.data;
     }
-    else if (vizDataDelta.deltaType == VizDataDeltaTypes._AddRemove){
-      function throwAddRemoveNI(type){ throw new Error('VizDataDeltaType AddRemove Not Implemented for type ' + type) }
+    else if (vizDataDelta.deltaType == VizDataDeltaTypes._Extend){
+      function throwExtendNI(type){ throw new Error('VizDataDeltaType Extend Not Implemented for type ' + type) }
       if (vizDataDelta.type == VizTypes._2D){ 
-        Array.prototype.push.apply(this.vizDataByName[vizDataDelta.name].x, vizDataDelta.add.x)
-        Array.prototype.push.apply(this.vizDataByName[vizDataDelta.name].y, vizDataDelta.add.y)
-        for (var i = vizDataDelta.remove.length-1; i >= 0; i--){
-          var idx = vizDataDelta.remove[i];
-          this.vizDataByName[vizDataDelta.name].x.splice(idx,1);
-          this.vizDataByName[vizDataDelta.name].y.splice(idx,1);
-        }
+        Array.prototype.push.apply(this.vizDataByName[vizDataDelta.name].x, vizDataDelta.data.x)
+        Array.prototype.push.apply(this.vizDataByName[vizDataDelta.name].y, vizDataDelta.data.y)
       }
-      else if (hasValue(VizTypes, vizDataDelta.type)){ throwAddRemoveNI(vizDataDelta.type) }
+      else if (hasValue(VizTypes, vizDataDelta.type)){ throwExtendNI(vizDataDelta.type) }
       else { throw new Error('Unknown VizDataType: ' + vizDataDelta.type); }
     }
     else { throw new Error('Unknown VizDataDeltaType: ' + vizDataDelta.deltaType); }
@@ -90,34 +82,12 @@ SocketVizServer.prototype._watchForUpdates = function(){
 
 //=============================================================
 
-SocketVizServer.prototype.test = function(){
-  this.socket.emit('vizDataInfo', [
-    { name: 'global cost', type: VizTypes._2D },
-  ]);
-  this.socket.on('subscribe', function(name){
-    this.socket.emit('vizDataDelta', {
-      name: 'global cost',
-      deltaType: VizDataDeltaTypes._Override,
-      type: VizTypes._2D,
-      data: { 'x': [ 1, 2, 3 ], 'y': [ 2, 4, 6 ] }
-    });
-    setInterval(function(){
-      this.socket.emit('vizDataDelta', {
-        name: 'global cost',
-        deltaType: VizDataDeltaTypes._AddRemove,
-        type: VizTypes._2D,
-        add: { 'x': [ 4, 5, 6 ], 'y': [ 9, 12, 15 ] },
-        remove: [],
-      });
-    }.bind(this), 2000);
-  }.bind(this));
-}
 
 //=============================================================
 
 var VizDataDeltaTypes = {
   _Override: 'Override',
-  _AddRemove: 'AddRemove',
+  _Extend: 'Extend',
 }
 
 var VizTypes = {
@@ -139,9 +109,52 @@ VizTypeDefaultValues[VizTypes._Log] = { lines: [] };
 
 //=============================================================
 
+function SocketVizServerConfig(socketConfig){
+  this.socketConfig = socketConfig;
+}
+
+function SocketConfig(){
+  this.serverURL = 'http://localhost:10012';
+}
+
+//=============================================================
+
 function TestSocket(){
   makeEventable(this);
 }
+
+TestSocket.prototype.test = function(){
+  this.emit('vizDataInfo', [
+    { name: 'global cost', type: VizTypes._2D },
+  ]);
+  this.on('subscribe', function(name){
+    this.emit('vizDataDelta', {
+      name: 'global cost',
+      deltaType: VizDataDeltaTypes._Override,
+      type: VizTypes._2D,
+      data: { 'x': [ 1, 2, 3 ], 'y': [ 2, 4, 6 ] }
+    });
+    setInterval(function(){
+      this.emit('vizDataDelta', {
+        name: 'global cost',
+        deltaType: VizDataDeltaTypes._AddRemove,
+        type: VizTypes._2D,
+        data: { 'x': [ 4, 5, 6 ], 'y': [ 9, 12, 15 ] }
+      });
+    }.bind(this), 2000);
+  }.bind(this));
+}
+
+//=============================================================
+
+function mkSocket(config){
+  var socket = io(config.serverURL + '/vizr')
+  return socket;
+}
+
+//=============================================================
+
+window.SocketConfig = SocketConfig;
 
 window.SocketVizServerConfig = SocketVizServerConfig;
 window.SocketVizServer = SocketVizServer;

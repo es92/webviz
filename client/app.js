@@ -32,12 +32,6 @@ var WebVizApp = React.createClass({
     this.createWindow(0, 0);
   },
   updateVizDataInfo: function(vizDataInfo){
-    vizDataInfo.forEach(function(vdi){
-      this.props.vizServer.registerVizDataDeltaListener(vdi.name, function(name, vdd){
-        console.log(name, vdd)
-        console.log(this.props.vizServer.getVizData(name))
-      }.bind(this));
-    }.bind(this));
     this.setState({ vizDataInfo: vizDataInfo });
   },
   createWindow: function(rowIdx, colIdx){
@@ -138,9 +132,9 @@ var WebVizApp = React.createClass({
   },
 });
 
-var serverConfig = new SocketVizServerConfig();
+var serverConfig = new SocketVizServerConfig(new SocketConfig());
 var vizServer = new SocketVizServer(serverConfig)
-vizServer.test()
+//vizServer.socket.test()
 
 ReactDOM.render(
   <WebVizApp vizServer={vizServer}/>,
