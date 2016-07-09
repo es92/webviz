@@ -72,7 +72,7 @@ window.VizWindow = React.createClass({
     }
     return (<div className='window'>
             {plotSelector}
-            <VizWindowDisplay vws={this.props.vws} vizDataByName={this.props.vizDataByName}/>
+            <VizWindowDisplay vws={this.props.vws} vizDataByName={this.props.vizDataByName} vizDataInfo={this.props.vizDataInfo}/>
             <VizWindowHeader handleTogglePlotSelector={this.togglePlotSelector}
                              handleRemove={this.props.handleRemove} />
             </div>)
@@ -83,11 +83,22 @@ window.VizWindow = React.createClass({
 
 window.VizWindowDisplay = React.createClass({
   render: function(){
-    var selections = ''
+    var data = {}
+    var type = null
     for (var name in this.props.vws.selectedVizDataInfo){
-      selections += name + ' ' + JSON.stringify(this.props.vizDataByName[name]) + '\n';
+      data[name] = this.props.vizDataByName[name];
+      var subtype = this.props.vizDataInfo[name];
+      if (type == null)
+        type = subtype;
+      if (subtype != type)
+        throw new Error('bad subtype ' + subtype + ' for type ' + type)
     }
-    return <div className="vizWindowDisplay">{selections}</div>
+    if (type === null)
+      return <div className="vizWindowDisplay"></div>;
+    else if (type === '2D')
+      return <div className="vizWindowDisplay"><Chart2D data={data}/></div>
+    else
+        throw new Error('unimplemented or unsupported type ' + type);
   }
 });
 
@@ -105,10 +116,12 @@ window.VizWindowPlotSelector = React.createClass({
     this.props.handleToggleSelectData(name);
   },
   render: function(){
-    var vizDataInfoToggleNodes = this.props.vizDataInfo.map(function(vdi){
-      var checked = vdi.name in this.props.selectedVizDataInfo;
-      return <div key={vdi.name}><input type="checkbox" checked={checked} onChange={this.toggleSelectData.bind(this, vdi.name)}/>{vdi.type} {vdi.name}</div>
-    }.bind(this));
+    var vizDataInfoToggleNodes = []
+    for (var name in this.props.vizDataInfo){
+      var checked = name in this.props.selectedVizDataInfo;
+      vizDataInfoToggleNodes.push(<div key={name}><input type="checkbox" checked={checked} onChange={this.toggleSelectData.bind(this, name)}/>{this.props.vizDataInfo[name]} {name}</div>)
+    }
+
     return (<div className='vizWindowPlotSelector'>
             {vizDataInfoToggleNodes}
             </div>)

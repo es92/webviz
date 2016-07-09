@@ -4,7 +4,7 @@
 function SocketVizServer(config){
   makeEventable(this);
   
-  this.vizDataInfo = [];
+  this.vizDataInfo = {};
 
   if (config.socketConfig == null)
     this.socket = new TestSocket();
@@ -54,8 +54,11 @@ SocketVizServer.prototype.getVizData = function(name){
 
 SocketVizServer.prototype._watchForUpdates = function(){
   this.socket.on('vizDataInfo', function(vizDataInfo){
-    this.vizDataInfo = vizDataInfo;
-    this.vizDataInfo.forEach(function(vdi){
+    vizDataInfo.forEach(function(vdi){
+      this.vizDataInfo[vdi.name] = vdi.type;
+    }.bind(this));
+
+    vizDataInfo.forEach(function(vdi){
       setDefault(this.vizDataByName, vdi.name, VizTypeDefaultValues[vdi.type])
     }.bind(this));
     this.emit('vizDataInfo', this.vizDataInfo)

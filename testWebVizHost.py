@@ -13,8 +13,8 @@ gc = vizr.add2D('global cost')
 
 N = 1
 
-for i in xrange(10):
-  gc.extend([N], [N*2])
+for i in xrange(1000):
+  gc.extend([N], [N**2])
   time.sleep(1)
   N += 1
 

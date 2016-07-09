@@ -84,7 +84,7 @@ var WebVizApp = React.createClass({
     this.setState({ windowGrid: this.state.windowGrid, vizDataListenerIds: this.state.vizDataListenerIds, vizDataListenersCounter: this.state.vizDataListenersCounter });
   },
   getInitialState: function() {
-    return { vizDataInfo: [], 
+    return { vizDataInfo: {}, 
              vizDataByName: {},
              vizDataListenersCounter: {},
              vizDataListenerIds: {},
