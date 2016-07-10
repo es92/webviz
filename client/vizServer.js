@@ -16,12 +16,18 @@ function SocketVizServer(config){
   this.listenerNamesById = {}
 
   this.vizDataByName = {}
+
+  this.layoutHints = {}
 }
 
 //=============================================================
 
 SocketVizServer.prototype.getVizDataInfo = function(){
   return this.vizDataInfo;
+}
+
+SocketVizServer.prototype.getLayoutHints = function(){
+  return this.layoutHints;
 }
 
 SocketVizServer.prototype.registerVizDataDeltaListener = function(name, listener){
@@ -63,6 +69,12 @@ SocketVizServer.prototype._watchForUpdates = function(){
     }.bind(this));
     this.emit('vizDataInfo', this.vizDataInfo)
   }.bind(this));
+
+  this.socket.on('layoutHints', function(hints){
+    this.layoutHints = hints
+    this.emit('layoutHints', this.layoutHints);
+  }.bind(this));
+
   this.socket.on('vizDataDelta', function(vizDataDelta){
     if (vizDataDelta.deltaType == VizDataDeltaTypes._Override){
       this.vizDataByName[vizDataDelta.name] = vizDataDelta.data;

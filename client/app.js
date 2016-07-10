@@ -1,7 +1,7 @@
 
 var Header = React.createClass({
   render: function(){
-    return <div className="header" /> 
+    return <div className="header">layout: {this.props.currentLayoutHint}</div>
   }
 });
 
@@ -28,11 +28,50 @@ function setWindowDims(vws, rowIdx, colIdx, dims){
 var WebVizApp = React.createClass({
   componentDidMount: function(){
     this.props.vizServer.on('vizDataInfo', this.updateVizDataInfo);
+    this.props.vizServer.on('layoutHints', this.updateLayoutHints)
     this.updateVizDataInfo(this.props.vizServer.getVizDataInfo())
-    this.createWindow(0, 0);
+    this.updateLayoutHints(this.props.vizServer.getLayoutHints())
   },
   updateVizDataInfo: function(vizDataInfo){
     this.setState({ vizDataInfo: vizDataInfo });
+  },
+  updateLayoutHints: function(layoutHints){
+    this.setState({ layoutHints: layoutHints });
+    if (this.state.keepLayout == false && size(layoutHints) > 0){
+      if (this.state.lastLayoutHint != null && this.state.lastLayoutHint in layoutHints){
+        this.setLayoutHint(this.state.lastLayoutHint, this.layoutHints[name], true);
+      }
+      else {
+        var keepLayout = this.state.lastLayoutHint == null;
+        var layoutHintName = null
+        for (var name in layoutHints){
+          if (layoutHintName == null)
+            layoutHintName = name;
+          if (layoutHints[name].isDefault){
+            layoutHintName = name;
+            break
+          }
+        }
+        this.setLayoutHint(layoutHintName, this.state.layoutHints[layoutHintName], keepLayout)
+      }
+    }
+  },
+  setLayoutHint: function(name, hint, keepLayout){
+    console.log('set', name, hint);
+    this.removeAllWindows();
+    for (var w in hint){
+      var row = hint[w]['position'][0];
+      var col = hint[w]['position'][1];
+      this.createWindow(row, col)
+      console.log(hint, w);
+      hint[w]['data'].forEach(function(name){ 
+        this.toggleSelectData(row, col, name) 
+      }.bind(this));
+    }
+    this.setState({ keepLayout: keepLayout, currentLayoutHint: name })
+  },
+  removeAllWindows: function(){
+    this.setState({ windowGrid: [ { id: UUID(), windows: [] } ], keepLayout: true })
   },
   createWindow: function(rowIdx, colIdx){
     var windowState = new WindowState();
@@ -50,12 +89,12 @@ var WebVizApp = React.createClass({
       }
     }
     windowGrid[rowIdx].windows[colIdx] = windowState;
-    this.setState({ windowGrid: windowGrid })
+    this.setState({ windowGrid: windowGrid, keepLayout: true, currentLayoutHint: 'custom' })
   },
   removeWindow: function(rowIdx, colIdx){
     var windowGrid = this.state.windowGrid;
     windowGrid[rowIdx].windows[colIdx] = null;
-    this.setState({ windowGrid: windowGrid })
+    this.setState({ windowGrid: windowGrid, keepLayout: true, currentLayoutHint: 'custom' })
   },
   updateVizData: function(name, data){
     this.state.vizDataByName[name] = this.props.vizServer.getVizData(name);
@@ -81,13 +120,17 @@ var WebVizApp = React.createClass({
       }
       vws.selectedVizDataInfo[name] = true;
     }
-    this.setState({ windowGrid: this.state.windowGrid, vizDataListenerIds: this.state.vizDataListenerIds, vizDataListenersCounter: this.state.vizDataListenersCounter });
+    this.setState({ windowGrid: this.state.windowGrid, vizDataListenerIds: this.state.vizDataListenerIds, vizDataListenersCounter: this.state.vizDataListenersCounter, keepLayout: true, currentLayoutHint: 'custom' });
   },
   getInitialState: function() {
     return { vizDataInfo: {}, 
              vizDataByName: {},
              vizDataListenersCounter: {},
              vizDataListenerIds: {},
+             layoutHints: {},
+             keepLayout: false,
+             currentLayoutHint: null,
+             lastLayoutHint: localStorage.lastLayoutHint,
              windowGrid: [ { id: UUID(), windows: [] } ], 
              dims: { width: 360, height: 240 },  };
   },
@@ -123,7 +166,7 @@ var WebVizApp = React.createClass({
 
     return (
       <div>
-        <Header />
+        <Header layoutHints={this.statelayoutHints} currentLayoutHint={this.state.currentLayoutHint}/>
         <div className="windows">
           {windowNodes}
         </div>

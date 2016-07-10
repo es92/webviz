@@ -32,9 +32,17 @@ class Vizr:
     self.eventQueueLoopThread.join()
     self._checkException()
 
+  def addLayoutHint(self, name, _hint, isDefault=False):
+    hint = {}
+    for windowNum, window in _hint.items():
+      hint[windowNum] = { 'data': [ handle._name for handle in window['data'] ], 
+                          'position': window['position'],
+                          'isDefault': isDefault }
+    self._sendMessage(('layoutHint', (name, hint)))
   def add2D(self, name):
     self._sendMessage(('addDataInfo', (name, '2D')))
     handle = Object()
+    handle._name = name
     def extend(xs, ys):
       self._sendMessage(('addData', (name, 'extend', { 'x': xs, 'y': ys })))
     handle.extend = extend
@@ -52,6 +60,8 @@ def eventQueueLoop(eventQueue, server, exceptionCheck):
   nameToData = {}
   nameToType = {}
 
+  layoutHints = {}
+
   clientToSubscriptions = {}
   subscriptionToClients = {}
 
@@ -66,6 +76,9 @@ def eventQueueLoop(eventQueue, server, exceptionCheck):
     for name in names:
       dataInfo.append({ 'name': name, 'type': nameToType[name] })
     send(client, 'vizDataInfo', dataInfo)
+
+  def sendLayoutHints(client):
+    send(client, 'layoutHints', layoutHints)
 
   def sendAllData(client, name):
     if name in nameToData:
@@ -94,6 +107,7 @@ def eventQueueLoop(eventQueue, server, exceptionCheck):
       if evt == 'connect':
         clients.add(client)
         sendDataInfo(client)
+        sendLayoutHints(client)
       elif evt == 'disconnect':
         clients.remove(client)
       elif evt == 'subscribe':
@@ -116,6 +130,10 @@ def eventQueueLoop(eventQueue, server, exceptionCheck):
         names.add(name)
         nameToType[name] = type
         sendDataInfo(None)
+      elif evt == 'layoutHint':
+        name, hint = data
+        layoutHints[name] = hint
+        sendLayoutHints(None)
       elif evt == 'addData':
         name, deltaType, data = data
         type = nameToType[name]
