@@ -83,7 +83,7 @@ window.VizWindow = React.createClass({
 
 window.VizWindowDisplay = React.createClass({
   render: function(){
-    var colors = [ 'blue', 'red', 'green', 'magenta', 'orange', 'purple', 'aqua', 'peru', 'pink', 'slategray', 'darkred', 'coral' ]
+    var colors = [ 'blue', 'red', 'green', 'magenta', 'orange', 'purple', 'aqua', 'peru', 'pink', 'slategray', 'darkred', 'coral' ];
     var data = {}
     var type = null
     for (var name in this.props.vws.selectedVizDataInfo){
