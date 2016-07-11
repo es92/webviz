@@ -83,6 +83,7 @@ window.VizWindow = React.createClass({
 
 window.VizWindowDisplay = React.createClass({
   render: function(){
+    var colors = [ 'blue', 'red', 'green', 'magenta', 'orange', 'purple', 'aqua', 'peru', 'pink', 'slategray', 'darkred', 'coral' ]
     var data = {}
     var type = null
     for (var name in this.props.vws.selectedVizDataInfo){
@@ -96,7 +97,7 @@ window.VizWindowDisplay = React.createClass({
     if (type === null)
       return <div className="vizWindowDisplay"></div>;
     else if (type === '2D')
-      return <div className="vizWindowDisplay"><Chart2D data={data}/></div>
+      return <div className="vizWindowDisplay"><Chart2D data={data} colors={colors}/></div>
     else
         throw new Error('unimplemented or unsupported type ' + type);
   }

@@ -58,6 +58,7 @@ window.Chart2D = React.createClass({
               return yScale(p[1]);
           })
 
+      var idx = 0;
       for (var name in this.props.data){
         var d = this.props.data[name];
         var ld = [];
@@ -65,9 +66,10 @@ window.Chart2D = React.createClass({
           ld.push([ d.x[i], d.y[i] ]);
         vis.append('svg:path')
             .attr('d', lineGen(ld))
-            .attr('stroke', 'green')
-            .attr('stroke-width', 2)
+            .attr('stroke', this.props.colors[idx])
+            .attr('stroke-width', 1)
             .attr('fill', 'none');
+        idx += 1
       }
     }
   },
