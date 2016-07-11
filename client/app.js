@@ -57,13 +57,11 @@ var WebVizApp = React.createClass({
     }
   },
   setLayoutHint: function(name, hint, keepLayout){
-    console.log('set', name, hint);
     this.removeAllWindows();
     for (var w in hint){
       var row = hint[w]['position'][0];
       var col = hint[w]['position'][1];
       this.createWindow(row, col)
-      console.log(hint, w);
       hint[w]['data'].forEach(function(name){ 
         this.toggleSelectData(row, col, name) 
       }.bind(this));
