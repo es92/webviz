@@ -6,7 +6,7 @@ def nonblocking_raw_input(message):
     sys.stdout.write(message)
     sys.stdout.flush()
     select.select([sys.stdin], [], [])
-    return sys.stdin.readline()
+    return sys.stdin.readline()[:-1]
 
 def nonblockingLooper(fn):
   import eventlet
@@ -17,13 +17,18 @@ def nonblockingLooper(fn):
     try:
       c = fn()
     except Exception as e:
-      Q.put(('e', e))
+      import traceback
+      Q.put(('e', (e, traceback.format_exc())))
+      return
     Q.put(('r', c))
   while True:
     eventlet.spawn(efn)
     t, msg = Q.get()
     if t == 'e':
-      exc = msg
+      exc, f_exc = msg
+      print '==========================='
+      print f_exc
+      print '==========================='
       raise exc
     elif t == 'r':
       c = msg
