@@ -218,4 +218,4 @@ class VizrServeThread:
     logger.addHandler(ch)
 
     self.app = socketio.Middleware(self.sio, self.flask)
-    eventlet.wsgi.server(eventlet.listen(('', 10012)), self.app, log=logger)
+    eventlet.wsgi.server(eventlet.listen(('127.0.0.1', 10012)), self.app, log=logger)
