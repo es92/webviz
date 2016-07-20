@@ -61,7 +61,7 @@ window.VizWindow = React.createClass({
     this.props.handleToggleSelectData(name);
   },
   getInitialState: function(){
-    return { 'showPlotSelector': true };
+    return { 'showPlotSelector': false };
   },
   render: function(){
     var plotSelector = null;

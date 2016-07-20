@@ -129,7 +129,7 @@ function SocketVizServerConfig(socketConfig){
 }
 
 function SocketConfig(){
-  this.serverURL = 'http://localhost:10012';
+
 }
 
 //=============================================================
@@ -163,7 +163,7 @@ TestSocket.prototype.test = function(){
 //=============================================================
 
 function mkSocket(config){
-  var socket = io(config.serverURL + '/vizr')
+  var socket = io()
   return socket;
 }
 

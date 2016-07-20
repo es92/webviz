@@ -74,7 +74,7 @@ window.Chart2D = React.createClass({
         for (var i = 0; i < d.x.length; i++)
           ld.push([ d.x[i], d.y[i] ]);
 
-        var LR = 100
+        var LR = 150
         var LH = 10
 
         var g = legend.append('g');
