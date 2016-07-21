@@ -9,7 +9,10 @@ class Object(object):
 class Vizr:
   def serve(self, port=10012, processFreq=.25):
     dirname = os.path.dirname(os.path.abspath(__file__))
-    self.server = subprocess.Popen(['/usr/bin/node', dirname + '/webVizHost.js', str(port), str(processFreq)], stdin=subprocess.PIPE)
+    pyPID = os.getpid()
+    self.server = subprocess.Popen(['/usr/bin/node', dirname + '/webVizHost.js', 
+                                     str(port), str(processFreq), str(pyPID)], 
+                                    stdin=subprocess.PIPE)
   def addLayoutHint(self, name, _hint, isDefault=False):
     hint = {}
     for windowNum, window in _hint.items():

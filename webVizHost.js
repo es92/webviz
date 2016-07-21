@@ -2,6 +2,18 @@
 
 var port = process.argv[2];
 var processFreq = parseFloat(process.argv[3])*1000
+var parentPID = parseFloat(process.argv[4]);
+
+setInterval(function(){ 
+  try{
+    process.kill(parentPID, 0)
+  } catch(e){
+    console.log(e);
+    process.exit(1);
+  }
+}, 1000);
+
+// ================================================
 
 var express = require('express');
 var app = express();
