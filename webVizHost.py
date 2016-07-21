@@ -3,6 +3,11 @@ import subprocess
 import json
 import os
 
+import numpy as np
+
+def filterToFinite(ns):
+  return [ n if np.isfinite(n) else None for n in ns ]
+
 class Object(object):
   pass
 
@@ -25,9 +30,13 @@ class Vizr:
     handle = Object()
     handle._name = name
     def extend(xs, ys):
+      xs = filterToFinite(xs)
+      ys = filterToFinite(ys)
       self._sendMessage(('addData', (name, 'extend', { 'x': xs, 'y': ys })))
     handle.extend = extend
     def replace(xs, ys):
+      xs = filterToFinite(xs)
+      ys = filterToFinite(ys)
       self._sendMessage(('addData', (name, 'replace', { 'x': xs, 'y': ys })))
     handle.replace = replace
     return handle

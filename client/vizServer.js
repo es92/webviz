@@ -65,7 +65,7 @@ SocketVizServer.prototype._watchForUpdates = function(){
     }.bind(this));
 
     vizDataInfo.forEach(function(vdi){
-      setDefault(this.vizDataByName, vdi.name, VizTypeDefaultValues[vdi.type])
+      setDefault(this.vizDataByName, vdi.name, jsonClone(VizTypeDefaultValues[vdi.type]))
     }.bind(this));
     this.emit('vizDataInfo', this.vizDataInfo)
   }.bind(this));

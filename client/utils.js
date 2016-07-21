@@ -58,6 +58,10 @@ window.size = function(obj){
   return c
 }
 
+window.jsonClone = function(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+
 window.hasValue = function(obj, val){
   for (var prop in obj)
     if (obj[prop] === val)
