@@ -43,6 +43,7 @@ window.Window = React.createClass({
     }
     else {
       return <VizWindow ref="window" vizDataInfo={this.props.vizDataInfo} 
+                                     vizDataVersionByName={this.props.vizDataVersionByName}
                                      vws={this.props.ws.vizWindowState} 
                                      vizDataByName={this.props.vizDataByName}
                                      handleToggleSelectData={this.toggleSelectData}
@@ -72,7 +73,7 @@ window.VizWindow = React.createClass({
     }
     return (<div className='window'>
             {plotSelector}
-            <VizWindowDisplay vws={this.props.vws} vizDataByName={this.props.vizDataByName} vizDataInfo={this.props.vizDataInfo}/>
+            <VizWindowDisplay vws={this.props.vws} vizDataByName={this.props.vizDataByName} vizDataVersionByName={this.props.vizDataVersionByName} vizDataInfo={this.props.vizDataInfo}/>
             <VizWindowHeader handleTogglePlotSelector={this.togglePlotSelector}
                              handleRemove={this.props.handleRemove} />
             </div>)
@@ -84,10 +85,12 @@ window.VizWindow = React.createClass({
 window.VizWindowDisplay = React.createClass({
   render: function(){
     var colors = [ 'blue', 'red', 'green', 'magenta', 'orange', 'purple', 'aqua', 'peru', 'pink', 'slategray', 'darkred', 'coral' ];
-    var data = {}
+    var data = {};
+    var dataVersion = {};
     var type = null
     for (var name in this.props.vws.selectedVizDataInfo){
       data[name] = this.props.vizDataByName[name];
+      dataVersion[name] = this.props.vizDataVersionByName[name];
       var subtype = this.props.vizDataInfo[name];
       if (type == null)
         type = subtype;
@@ -97,7 +100,7 @@ window.VizWindowDisplay = React.createClass({
     if (type === null)
       return <div className="vizWindowDisplay"></div>;
     else if (type === '2D')
-      return <div className="vizWindowDisplay"><Chart2D data={data} colors={colors}/></div>
+      return <div className="vizWindowDisplay"><Chart2D data={data} dataVersion={dataVersion} colors={colors}/></div>
     else
         throw new Error('unimplemented or unsupported type ' + type);
   }

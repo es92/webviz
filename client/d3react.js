@@ -4,22 +4,33 @@
 window.Chart2D = React.createClass({
   componentDidMount: function() {
     var el = ReactDOM.findDOMNode(this.refs.div)
-
+    this._dataVersion = {}
   },
 
   componentDidUpdate: function() {
+
     var el = ReactDOM.findDOMNode(this.refs.div)
 
     var vis = d3.select(el);
 
-    vis.selectAll("*").remove();
-
     var W = el.parentNode.getBoundingClientRect().width;
     var H = el.parentNode.getBoundingClientRect().height;
 
+    var hasUpdate = false;
+
     var dataArray = [];
-    for (var name in this.props.data)
+    for (var name in this.props.data){
       dataArray.push(this.props.data[name])
+      if (this.props.dataVersion[name] !== this._dataVersion[name]){
+        hasUpdate = true;
+        this._dataVersion[name] = this.props.dataVersion[name];
+      }
+    }
+
+    if (!hasUpdate)
+      return;
+
+    vis.selectAll("*").remove();
 
     if (dataArray[0].x.length > 0){
 

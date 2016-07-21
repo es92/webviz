@@ -96,6 +96,11 @@ var WebVizApp = React.createClass({
   },
   updateVizData: function(name, data){
     this.state.vizDataByName[name] = this.props.vizServer.getVizData(name);
+    if (!(name in this.state.vizDataVersionByName))
+      this.state.vizDataVersionByName[name] = 0;
+    else
+      this.state.vizDataVersionByName[name] += 1;
+    this.setState({ vizDataVersionByName: this.state.vizDataVersionByName })
     this.setState({ vizDataByName: this.state.vizDataByName })
   },
   toggleSelectData: function(rowIdx, colIdx, name){
@@ -123,6 +128,7 @@ var WebVizApp = React.createClass({
   getInitialState: function() {
     return { vizDataInfo: {}, 
              vizDataByName: {},
+             vizDataVersionByName: {},
              vizDataListenersCounter: {},
              vizDataListenerIds: {},
              layoutHints: {},
@@ -145,6 +151,7 @@ var WebVizApp = React.createClass({
         return <Window key={vizWindowState.id} ws={vizWindowState} 
                                                vizDataInfo={this.state.vizDataInfo} 
                                                vizDataByName={this.state.vizDataByName}
+                                               vizDataVersionByName={this.state.vizDataVersionByName}
                                                handleToggleSelectData={this.toggleSelectData}
                                                handleRemove={this.removeWindow}/>
       }.bind(this));
