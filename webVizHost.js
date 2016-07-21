@@ -179,6 +179,10 @@ io.on('connection', function(socket){
   });
 
   socket.on('disconnect', function(){
+    for (var name in idToSubscriptions[socket.id]){
+      delete subscriptionToIds[name][socket.id];
+      delete idToSubscriptions[socket.id][name];
+    }
     delete idToSockets[socket.id]
   });
 });
