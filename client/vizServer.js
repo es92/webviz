@@ -93,6 +93,17 @@ SocketVizServer.prototype._watchForUpdates = function(){
       this.listenersByName[vizDataDelta.name][id](vizDataDelta.name, vizDataDelta);
     }
   }.bind(this));
+
+  var disconnected = false;
+  
+  this.socket.on('connect', function(){
+    if (disconnected)
+      window.location.reload()
+  }.bind(this));
+
+  this.socket.on('disconnect', function(){
+    disconnected = true;
+  }.bind(this));
 }
 
 //=============================================================
