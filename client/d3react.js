@@ -19,11 +19,18 @@ window.Chart2D = React.createClass({
     var hasUpdate = false;
 
     var dataArray = [];
+    var nextDataVersion = {}
     for (var name in this.props.data){
       dataArray.push(this.props.data[name])
       if (this.props.dataVersion[name] !== this._dataVersion[name]){
         hasUpdate = true;
         this._dataVersion[name] = this.props.dataVersion[name];
+      }
+    }
+
+    for (var name in this._dataVersion){
+      if (this.props.data[name] == null){
+        hasUpdate = true
       }
     }
 
