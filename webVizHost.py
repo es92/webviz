@@ -17,7 +17,7 @@ class Vizr:
     pyPID = os.getpid()
     self.server = subprocess.Popen(['/usr/bin/node', dirname + '/webVizHost.js', 
                                      str(port), str(processFreq), str(pyPID)], 
-                                    stdin=subprocess.PIPE)
+                                    stdin=subprocess.PIPE, preexec_fn=os.setpgrp)
   def addLayoutHint(self, name, _hint, isDefault=False):
     hint = {}
     for windowNum, window in _hint.items():
