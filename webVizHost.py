@@ -25,6 +25,23 @@ class Vizr:
                           'position': window['position'],
                           'isDefault': isDefault }
     self._sendMessage(('layoutHint', (name, hint)))
+  def addSmooth2D(self, name, N=10):
+
+    handle = self.add2D(name)
+
+    all_ys = []
+
+    def new_extend(xs, ys):
+      all_ys.extend(ys)
+      smooth_ys = [ float(np.mean(all_ys[len(all_ys)-N-(i-1):len(all_ys)-(i-1)])) for i in xrange(len(ys), 0, -1) ]
+      return handle.extend(xs, smooth_ys)
+
+    new_handle = Object()
+    new_handle.extend = new_extend
+    new_handle.replace = handle.replace
+    new_handle._name = handle._name
+
+    return new_handle
   def add2D(self, name):
     self._sendMessage(('addDataInfo', (name, '2D')))
     handle = Object()
@@ -43,3 +60,27 @@ class Vizr:
   def _sendMessage(self, msg):
     self.server.stdin.write(json.dumps(msg) + '\n')
     self.server.stdin.flush()
+
+class VizrPage:
+  def __init__(self, vizr):
+    self.vizs = {}
+    self.vizr = vizr
+  def addSmooth2D(self, name, coord, N=10):
+    self.vizs[name] = [ self.vizr.addSmooth2D(name, N), coord ]
+    return self.vizs[name][0]
+  def add2D(self, name, coord):
+    self.vizs[name] = [ self.vizr.add2D(name), coord ]
+  def makeDefault(self):
+
+    coord_to_vizs = {}
+    for [ v, c ] in self.vizs.values():
+      coord_to_vizs.setdefault(tuple(c), [])
+      coord_to_vizs[tuple(c)].append(v)
+
+    boxes = {}
+    for i, (c, vs) in enumerate(coord_to_vizs.items()):
+      boxes[str(i)] = { 'data': vs, 'position': c }
+
+    self.vizr.addLayoutHint('everything', boxes)
+  def __getitem__(self, key):
+    return self.vizs[key][0]
