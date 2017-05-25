@@ -65,15 +65,19 @@ class VizrPage:
   def __init__(self, vizr):
     self.vizs = {}
     self.vizr = vizr
+    self.ordered_vizs = []
   def addSmooth2D(self, name, coord, N=10):
     self.vizs[name] = [ self.vizr.addSmooth2D(name, N), coord ]
+    self.ordered_vizs.append(self.vizs[name])
     return self.vizs[name][0]
   def add2D(self, name, coord):
     self.vizs[name] = [ self.vizr.add2D(name), coord ]
+    self.ordered_vizs.append(self.vizs[name])
   def makeDefault(self):
 
     coord_to_vizs = {}
-    for [ v, c ] in self.vizs.values():
+
+    for (v, c) in self.ordered_vizs:
       coord_to_vizs.setdefault(tuple(c), [])
       coord_to_vizs[tuple(c)].append(v)
 
@@ -82,5 +86,7 @@ class VizrPage:
       boxes[str(i)] = { 'data': vs, 'position': c }
 
     self.vizr.addLayoutHint('everything', boxes)
+  def __contains__(self, key):
+    return key in self.vizs
   def __getitem__(self, key):
     return self.vizs[key][0]
